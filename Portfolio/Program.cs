@@ -158,7 +158,7 @@ app.MapPost("/admin/upload/{kind}", async (
         StringComparer.OrdinalIgnoreCase)
     {
         "projects",
-        "education",
+        "education", 
         "profile",
         "technologies"
     };
