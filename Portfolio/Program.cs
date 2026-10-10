@@ -1,7 +1,5 @@
 using System.Security.Claims;
 using System.Threading.RateLimiting;
-using Amazon.Runtime;
-using Amazon.S3;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -31,29 +29,7 @@ if (string.IsNullOrWhiteSpace(connectionString))
 
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
-var r2Endpoint = builder.Configuration["R2:Endpoint"]
-                 ?? throw new InvalidOperationException("R2:Endpoint não configurado.");
-
-var r2AccessKey = builder.Configuration["R2:AccessKey"]
-                  ?? throw new InvalidOperationException("R2:AccessKey não configurado.");
-
-var r2SecretKey = builder.Configuration["R2:SecretKey"]
-                  ?? throw new InvalidOperationException("R2:SecretKey não configurado.");
-
-var r2Credentials = new BasicAWSCredentials(r2AccessKey, r2SecretKey);
-
-builder.Services.AddSingleton<IAmazonS3>(_ =>
-{
-    var config = new AmazonS3Config
-    {
-        ServiceURL = r2Endpoint,
-        ForcePathStyle = true
-    };
-
-    return new AmazonS3Client(r2Credentials, config);
-});
-
-builder.Services.AddScoped<IStorageService, R2StorageService>();
+builder.Services.AddScoped<IStorageService, AzureBlobStorageService>();
 
 builder.Services.AddPooledDbContextFactory<PortfolioDbContext>(o =>
     o.UseNpgsql(connectionString));
